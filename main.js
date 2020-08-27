@@ -11,8 +11,8 @@ function templateHTML(title, list, body) {
   </head>
   <body>
     <h1><a href="/">WEB</a></h1>
-    <h2>${title}</h2>
     ${list}
+    <a href = "/create">create</a>
     ${body}
   </body>
   </html>
@@ -26,6 +26,7 @@ function templateList(files) {
     i = i + 1;
   }
   list = list + '</ul>';
+  return list;
 }
 
 var app = http.createServer(function (request, response) { //서버 객체
@@ -44,7 +45,7 @@ var app = http.createServer(function (request, response) { //서버 객체
 
         var list = templateList(files);
 
-        var template = templateHTML(title, list, `<h2>${title}</h2>${description}`);
+        var template = templateHTML(title, list,`<h2>${title}</h2>${description}`);
         response.writeHead(200);
         response.end(template);
 
@@ -65,6 +66,30 @@ var app = http.createServer(function (request, response) { //서버 객체
       });
     }
   }
+  else if(pathname==='/create'){
+    fs.readdir('./data/', (err, files) => {
+
+      var title = 'Welcome';
+      var list = templateList(files);
+
+      var template = templateHTML(title, list, `
+       <form action = "http://localhost:3000/process_create"
+       method = "post">
+       <p>
+       <input type="text" name = "title" placeholder = "title">
+       </p>
+       <p>
+       <textarea name = "description"></textarea>
+       </p>
+       <input type="submit">
+       </form>
+      `);
+      response.writeHead(200);
+      response.end(template);
+
+    });
+  }
+  
   else {
     response.writeHead(404);
     response.end('Not found');
